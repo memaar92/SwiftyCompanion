@@ -8,8 +8,15 @@
 import SwiftUI
 
 struct HomeView: View {
+    
+    @State var isLoggedIn: Bool = false
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        if !isLoggedIn {
+            LoginView(isloggedIn: $isLoggedIn)
+        } else {
+            IDView()
+        }
     }
 }
 

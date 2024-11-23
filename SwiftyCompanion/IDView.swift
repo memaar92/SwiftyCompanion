@@ -16,8 +16,9 @@ struct IDView: View {
             BackgroundView()
             Circle()
                 .fill(Color.yellow)
-                .blur(radius: 20)
+                .blur(radius: 80)
                 .position(x: 110, y: 520)
+                .opacity(0.8)
             VStack {
                 ProfileCardView()
                     .padding(40)

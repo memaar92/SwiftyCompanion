@@ -8,11 +8,20 @@
 import SwiftUI
 
 struct ButtonView: View {
+    
+    var title: String
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        Text(title)
+            .font(.title3)
+            .fontWeight(.semibold)
+            .frame(width: 361, height: 48)
+            .background(Color.black)
+            .foregroundColor(.white)
+            .cornerRadius(24)
     }
 }
 
 #Preview {
-    ButtonView()
+    ButtonView(title: "Test title")
 }

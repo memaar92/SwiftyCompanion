@@ -8,11 +8,35 @@
 import SwiftUI
 
 struct LoginView: View {
+    
+    @Binding var isloggedIn: Bool
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        ZStack {
+            Circle()
+                .fill(Color.yellow)
+                .blur(radius: 80)
+                .position(x: 200, y: 400)
+                .opacity(0.8)
+            VStack {
+                Spacer()
+                Text("Swifty\nCompanion")
+                    .font(.largeTitle)
+                    .foregroundColor(.black)
+                    .padding()
+                Spacer()
+                Button {
+                    //add 42 API call
+                    isloggedIn.toggle()
+                } label: {
+                    ButtonView(title: "Login with 42")
+                }
+                .padding()
+            }
+        }
     }
 }
 
 #Preview {
-    LoginView()
+    LoginView(isloggedIn: .constant(false as Bool))
 }

@@ -14,7 +14,7 @@ struct SwiftyCompanionApp: App {
             ZStack {
                 Color .BG
                     .ignoresSafeArea()
-                IDView()
+                HomeView()
             }
         }
     }
