@@ -10,6 +10,7 @@ import SwiftUI
 struct IDView: View {
     
     @State var isShowingDetailView = false
+    @State private var user: FortyTwoUser?
     
     var body: some View {
         ZStack {
@@ -20,39 +21,47 @@ struct IDView: View {
                 .position(x: 110, y: 520)
                 .opacity(0.8)
             VStack {
-                ProfileCardView()
+                ProfileCardView(user: user)
                     .padding(40)
                     .opacity(0.8)
                     .onTapGesture {
                         isShowingDetailView.toggle()
                     }
-                Text("😎 mamesser")
+                Text("😎 \(user?.login ?? "unknown")")
                     .font(.largeTitle)
                     .padding(.bottom, 10)
                 VStack (alignment: .leading) {
                     HStack {
                         Image(systemName: "star")
-                        Text("level 11")
+                        Text("level \(user?.cursusUsers[1].level ?? 0)")
                             .font(.body)
                     }
                     .padding(4)
                     HStack {
                         Image(systemName: "dollarsign.circle")
-                        Text("wallet 2711")
+                        Text("wallet \(user?.wallet ?? 0)")
                             .font(.body)
                     }
                     .padding(4)
                     HStack {
                         Image(systemName: "pencil.tip.crop.circle")
-                        Text("eval points 5")
+                        Text("eval points \(user?.correctionPoint ?? 0)")
                     }
                     .padding(4)
                 }
                
                 Spacer()
             }
+            .task {
+                do {
+                    user = try await getMyUser()
+                } catch {
+                    // replace with alert? refresh page? to trigger getMyUser again?
+                    print("Error getting user data")
+                }
+            }
             .sheet(isPresented: $isShowingDetailView) {
-                DetailView()
+                DetailView(user: user)
                     .presentationDragIndicator(.visible)
             }
         }
@@ -60,6 +69,9 @@ struct IDView: View {
 }
 
 struct ProfileCardView: View {
+    
+    var user: FortyTwoUser?
+    
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 24, style: .continuous)
@@ -75,9 +87,13 @@ struct ProfileCardView: View {
                 .frame(width: 325, height: 418)
                 .shadow(radius: 8)
             
-            Image("profile_image")
-                .resizable()
-                .aspectRatio(contentMode: .fill)
+            AsyncImage(url: URL(string: user?.image.link ?? "")) { image in
+                image
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+            } placeholder: {
+                Rectangle()
+            }
         }
         .frame(width: 325, height: 418)
         .cornerRadius(24)

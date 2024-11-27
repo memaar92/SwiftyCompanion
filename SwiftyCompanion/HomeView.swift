@@ -9,11 +9,11 @@ import SwiftUI
 
 struct HomeView: View {
     
-    @State var isLoggedIn: Bool = false
+    @StateObject var viewModel = HomeViewModel()
     
     var body: some View {
-        if !isLoggedIn {
-            LoginView(isloggedIn: $isLoggedIn)
+        if !viewModel.isSignedIn {
+            LoginView()
         } else {
             IDView()
         }

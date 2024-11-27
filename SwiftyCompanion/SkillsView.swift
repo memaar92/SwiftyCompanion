@@ -8,31 +8,33 @@
 import SwiftUI
 
 struct SkillsView: View {
+    
+    var skills: [Skill]
+    
     var body: some View {
-        List {
-            HStack {
-                Text("First Skill")
-                Spacer()
-                Text("5.8")
-            }
-            .listRowBackground(Color.BG)
-            HStack {
-                Text("Second Skill")
-                Spacer()
-                Text("3.0")
-            }
-            .listRowBackground(Color.BG)
-            HStack {
-                Text("Third Skill")
-                Spacer()
-                Text("1.0")
-            }
-            .listRowBackground(Color.BG)
+        List(skills) { skill in
+            SkillItemView(skill: skill)
         }
         .scrollContentBackground(.hidden)
     }
 }
 
+
+struct SkillItemView: View {
+    
+    var skill: Skill
+    
+    var body: some View {
+        HStack {
+            Text(skill.name)
+            Spacer()
+            Text("\(skill.level)")
+        }
+        .listRowBackground(Color.BG)
+    }
+}
+
+
 #Preview {
-    SkillsView()
+    SkillsView(skills: [])
 }

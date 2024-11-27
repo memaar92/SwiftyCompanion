@@ -11,6 +11,7 @@ struct DetailView: View {
     
     @StateObject var viewModel = DetailViewModel()
     @State private var currentSegment = "Projects"
+    var user: FortyTwoUser?
     
     var body: some View {
         ZStack {
@@ -19,10 +20,10 @@ struct DetailView: View {
                 DismissButtonView()
                 CustomSegmentedView(segments: viewModel.segmentTitles, selected: $currentSegment)
                 if (currentSegment == "Projects") {
-                    ProjectView()
+                    ProjectView(projects: user?.projectsUsers ?? [])
                 }
                 else if (currentSegment == "Skills") {
-                    SkillsView()
+                    SkillsView(skills: user?.cursusUsers[1].skills ?? [])
                 }
             }
         }

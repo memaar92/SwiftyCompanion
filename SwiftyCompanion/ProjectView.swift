@@ -8,31 +8,36 @@
 import SwiftUI
 
 struct ProjectView: View {
+    
+    var projects: [Project]
+    
     var body: some View {
-        List {
-            HStack {
-                Text("First Project")
-                Spacer()
-                Text("💪")
-            }
-            .listRowBackground(Color.BG)
-            HStack {
-                Text("Second Project")
-                Spacer()
-                Text("💪")
-            }
-            .listRowBackground(Color.BG)
-            HStack {
-                Text("Third Project")
-                Spacer()
-                Text("💀")
-            }
-            .listRowBackground(Color.BG)
+        List(projects) { project in
+            ProjectItemView(project: project)
         }
         .scrollContentBackground(.hidden)
     }
 }
 
+
+struct ProjectItemView: View {
+    
+    var project: Project
+    
+    var body: some View {
+        HStack {
+            Text(project.project.name)
+            Spacer()
+            if project.finalMark! > 0 {
+                Text("💪")
+            } else {
+                Text("💀")
+            }
+        }
+        .listRowBackground(Color.BG)
+    }
+}
+
 #Preview {
-    ProjectView()
+    ProjectView(projects: [])
 }

@@ -16,6 +16,7 @@ class LoginViewModel: ObservableObject {
         url42Auth = buildEndpoint()
     }
     
+    
     func authWith42(callbackURL: URL) async throws {
         let queryItems = URLComponents(string: callbackURL.absoluteString)?.queryItems
         guard let code = queryItems?.filter({ $0.name == "code" }).first?.value else {
@@ -23,15 +24,18 @@ class LoginViewModel: ObservableObject {
         }
         print("Code: \(code)")
         // may remove guard; depening on what is done with token
-        guard let token = try await getToken(code: code) else {
-            throw NetworkError.missingToken
-        }
-        print ("Token: \(token)")
+        try await createToken(code: code)
     }
     
-    func getToken(code: String) async throws -> String? {
+    
+    func createToken(code: String) async throws -> Void {
         let url = URL(string: "https://api.intra.42.fr/oauth/token")!
-        let postData = PostData(code: code, client_id: ProcessInfo.processInfo.environment["clientID"]!, client_secret: ProcessInfo.processInfo.environment["clientSecret"]!, grant_type: "authorization_code", redirect_uri: "swiftyapp://oauth-callback")
+        let postData = PostData(code: code,
+                                client_id: ProcessInfo.processInfo.environment["clientID"]!,
+                                client_secret: ProcessInfo.processInfo.environment["clientSecret"]!,
+                                grant_type: "authorization_code",
+                                redirect_uri: "swiftyapp://oauth-callback")
+        
         // may also run in a do {} statement?
         let jsonData = try JSONEncoder().encode(postData)
         
@@ -53,9 +57,32 @@ class LoginViewModel: ObservableObject {
             let decoder = JSONDecoder()
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             let token = try decoder.decode(Token.self, from: data)
-            return token.accessToken
+            try await storeTokenOnKeychain(token: token)
         } catch {
             throw NetworkError.missingToken
+        }
+    }
+    
+    
+    func storeTokenOnKeychain(token: Token) async throws {
+        let accessToken = token.accessToken.data(using: .utf8)!
+        let tag = "swiftyapp-token"
+        let expirationDate = String(TimeInterval(token.createdAt + token.expiresIn)).data(using: .utf8)!
+        let addquery: [String: Any] = [kSecClass as String: kSecClassGenericPassword,
+                                       kSecAttrAccount as String: tag,
+                                       kSecAttrGeneric as String: expirationDate,
+                                       kSecValueData as String: accessToken]
+        
+        let status = SecItemAdd(addquery as CFDictionary, nil)
+        
+        guard status != errSecDuplicateItem else {
+            print("throw error: item already exists")
+            return
+        }
+        
+        guard status == errSecSuccess else {
+            print("throw error: \(status)")
+            return
         }
     }
     
@@ -70,6 +97,10 @@ func buildEndpoint() -> URL {
 
 struct Token: Decodable {
     let accessToken: String
+    let tokenType: String // may remove
+    let expiresIn: Double
+    let scope: String // may remove
+    let createdAt: Double
 }
 
 struct PostData: Encodable {
