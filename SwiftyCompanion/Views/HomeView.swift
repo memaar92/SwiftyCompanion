@@ -9,15 +9,23 @@ import SwiftUI
 
 struct HomeView: View {
     
-    @StateObject var viewModel = HomeViewModel()
     @StateObject private var authManager = AuthManager.shared
     
     var body: some View {
-        if !authManager.isLoggedIn {
-            LoginView()
-        } else {
-            IDView()
+        VStack {
+            if !authManager.isLoggedIn {
+                LoginView()
+            } else {
+                IDView()
+            }
         }
+        .onAppear {
+            Task {
+               try await authManager.checkToken()
+            }
+        }
+        
+        
     }
     
 }

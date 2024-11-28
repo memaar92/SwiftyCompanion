@@ -12,7 +12,6 @@ struct LoginView: View {
     
     @Environment(\.webAuthenticationSession) private var webAuthenticationSession
     @ObservedObject private var viewModel = LoginViewModel()
-    //@Binding var isSignedIn: Bool
     @State private var selectedAlert: AlertItem?
     
     var body: some View {
@@ -37,7 +36,6 @@ struct LoginView: View {
                                 callbackURLScheme: viewModel.callBackURLScheme,
                                 preferredBrowserSession: .ephemeral)
                             try await viewModel.authWith42(callbackURL: callbackURL)
-                            //isSignedIn.toggle()
                         } catch AuthError.missingAuthCode, AuthError.missingAccessToken, NetworkError.unsuccessfulResponse {
                             selectedAlert = AlertContext.missingAuth
                         } catch NetworkError.noResponse {

@@ -19,7 +19,7 @@ actor AuthManager: ObservableObject {
     
     func checkToken() async throws {
         do {
-            try await getToken()
+            _ = try await getToken()
             await updateLoginState(newState: true)
         } catch {
             await updateLoginState(newState: false)
