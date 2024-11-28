@@ -13,7 +13,7 @@ struct HomeView: View {
     
     var body: some View {
         if !viewModel.isSignedIn {
-            LoginView()
+            LoginView(isSignedIn: $viewModel.isSignedIn)
         } else {
             IDView()
         }

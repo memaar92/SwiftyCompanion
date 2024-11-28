@@ -28,10 +28,14 @@ struct ProjectItemView: View {
         HStack {
             Text(project.project.name)
             Spacer()
-            if project.finalMark! > 0 {
-                Text("💪")
+            if project.finalMark == nil {
+                Text("🏃‍♂️")
             } else {
-                Text("💀")
+                if project.finalMark! > 0 {
+                    Text("💪")
+                } else {
+                    Text("💀")
+                }
             }
         }
         .listRowBackground(Color.BG)

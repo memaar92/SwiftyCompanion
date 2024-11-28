@@ -15,7 +15,7 @@ final class HomeViewModel: ObservableObject {
     init() {
         isSignedIn = false
         Task {
-            let isSignedIn = try await AuthManager().checkToken()
+            let isSignedIn = try await AuthManager.shared.checkToken()
             DispatchQueue.main.async {
                 self.isSignedIn = isSignedIn
             }

@@ -7,13 +7,19 @@
 
 import SwiftUI
 
-func getMyUser() async throws -> FortyTwoUser {
+class IDViewModel: ObservableObject {
     
-    let networkUtil = NetworkingWrapper(authManager: AuthManager()) // is this the correct usage?
-    let url = URL(string: "https://api.intra.42.fr/v2/me")!
+    let networkManager = NetworkManager()
+    @Published var user: FortyTwoUser?
     
-    let user = try await networkUtil.makeAuthorizedGetRequest(url: url) as FortyTwoUser
-    return user
+    func getMyUser() async throws {
+        let url = URL(string: "https://api.intra.42.fr/v2/me")!
+        let user = try await networkManager.makeAuthorizedGetRequest(url: url) as FortyTwoUser
+        DispatchQueue.main.async {
+            self.user = user
+        }
+    }
+    
 }
 
 

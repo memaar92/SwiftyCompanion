@@ -9,8 +9,8 @@ import SwiftUI
 
 struct IDView: View {
     
+    @ObservedObject private var viewModel = IDViewModel()
     @State var isShowingDetailView = false
-    @State private var user: FortyTwoUser?
     
     var body: some View {
         ZStack {
@@ -21,40 +21,48 @@ struct IDView: View {
                 .position(x: 110, y: 520)
                 .opacity(0.8)
             VStack {
-                ProfileCardView(user: user)
+                ProfileCardView(user: viewModel.user)
                     .padding(40)
                     .opacity(0.8)
                     .onTapGesture {
                         isShowingDetailView.toggle()
                     }
-                Text("😎 \(user?.login ?? "unknown")")
+                Text("😎 \(viewModel.user?.login ?? "unknown")")
                     .font(.largeTitle)
                     .padding(.bottom, 10)
                 VStack (alignment: .leading) {
                     HStack {
                         Image(systemName: "star")
-                        Text("level \(user?.cursusUsers[1].level ?? 0)")
+                        Text("level \(viewModel.user?.cursusUsers[1].level ?? 0)")
                             .font(.body)
                     }
                     .padding(4)
                     HStack {
                         Image(systemName: "dollarsign.circle")
-                        Text("wallet \(user?.wallet ?? 0)")
+                        Text("wallet \(viewModel.user?.wallet ?? 0)")
                             .font(.body)
                     }
                     .padding(4)
                     HStack {
                         Image(systemName: "pencil.tip.crop.circle")
-                        Text("eval points \(user?.correctionPoint ?? 0)")
+                        Text("eval points \(viewModel.user?.correctionPoint ?? 0)")
                     }
                     .padding(4)
+                    Button {
+                        Task {
+                            try await AuthManager().deleteTokenOnKeychain()
+                        }
+                    } label: {
+                        ButtonView(title: "Logout")
+                    }
                 }
                
                 Spacer()
             }
             .task {
                 do {
-                    user = try await getMyUser()
+                   // user = try await viewModel.getMyUser()
+                    try await viewModel.getMyUser()
                 } catch {
                     // add more concrete error handling based on error cases
                     // send to login page? replace with alert? refresh view to trigger getMyUser again?
@@ -62,7 +70,7 @@ struct IDView: View {
                 }
             }
             .sheet(isPresented: $isShowingDetailView) {
-                DetailView(user: user)
+                DetailView(user: viewModel.user)
                     .presentationDragIndicator(.visible)
             }
         }

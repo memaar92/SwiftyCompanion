@@ -10,10 +10,11 @@ import Security
 
 
 actor AuthManager {
+    static let shared = AuthManager()
+    
     private var refreshTask: Task<String, Error>?
     
     func checkToken() async throws -> Bool {
-        // could exclude a specific throw in case we want the app to crash in that case
         do {
             try await getToken()
             return true

@@ -7,13 +7,7 @@
 
 import SwiftUI
 
-class NetworkingWrapper {
-
-    let authManager: AuthManager
-
-    init(authManager: AuthManager) {
-        self.authManager = authManager
-    }
+struct NetworkManager {
 
     func makeAuthorizedGetRequest<T: Decodable>(url: URL) async throws -> T {
         let request = try await createAuthorizedGetRequest(from: url)
@@ -42,7 +36,7 @@ class NetworkingWrapper {
     private func createAuthorizedGetRequest(from url: URL) async throws -> URLRequest {
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        let accessToken = try await authManager.getToken()
+        let accessToken = try await AuthManager.shared.getToken()
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         return request
     }
