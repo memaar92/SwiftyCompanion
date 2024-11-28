@@ -56,7 +56,8 @@ struct IDView: View {
                 do {
                     user = try await getMyUser()
                 } catch {
-                    // replace with alert? refresh page? to trigger getMyUser again?
+                    // add more concrete error handling based on error cases
+                    // send to login page? replace with alert? refresh view to trigger getMyUser again?
                     print("Error getting user data")
                 }
             }

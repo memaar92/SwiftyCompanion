@@ -15,28 +15,19 @@ struct AlertItem: Identifiable {
 }
 
 struct AlertContext {
-    static let missingCode = AlertItem(
+    static let missingAuth = AlertItem(
         title: Text("Authentication Failed"),
-        message: Text("Could not get what we were looking for. Please try again later."),
+        message: Text("We could not authenticate you. Please try again later."),
         dismissButton: .default(Text("OK"))
     )
-    static let missingToken = AlertItem(
-        title: Text("Authentication Failed"),
-        message: Text("Could not get what we were looking for. Please try again later."),
-        dismissButton: .default(Text("OK"))
-    )
+
     static let noResponse = AlertItem(
         title: Text("Server Error"),
         message: Text("Could not connect to 42. Please try again later."),
         dismissButton: .default(Text("OK"))
     )
-    static let unsuccessfulResponse = AlertItem(
-        title: Text("Authentication Failed"),
-        message: Text("Could not get what we were looking for. Please try again later."),
-        dismissButton: .default(Text("OK"))
-    )
     static let genericError = AlertItem(
-        title: Text("Authentication Failed"),
+        title: Text("Server Error"),
         message: Text("Something went wrong. Please try again later."),
         dismissButton: .default(Text("OK"))
     )

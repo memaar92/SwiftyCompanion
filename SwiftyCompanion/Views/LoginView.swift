@@ -37,14 +37,10 @@ struct LoginView: View {
                                 callbackURLScheme: viewModel.callBackURLScheme,
                                 preferredBrowserSession: .ephemeral)
                             try await viewModel.authWith42(callbackURL: callbackURL)
-                        } catch NetworkError.missingCode {
-                            selectedAlert = AlertContext.missingCode
-                        } catch NetworkError.missingToken {
-                            selectedAlert = AlertContext.missingToken
+                        } catch AuthError.missingAuthCode, AuthError.missingAccessToken, NetworkError.unsuccessfulResponse {
+                            selectedAlert = AlertContext.missingAuth
                         } catch NetworkError.noResponse {
                             selectedAlert = AlertContext.noResponse
-                        } catch NetworkError.unsuccessfulResponse {
-                            selectedAlert = AlertContext.unsuccessfulResponse
                         } catch {
                             selectedAlert = AlertContext.genericError
                         }

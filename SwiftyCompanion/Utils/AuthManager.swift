@@ -1,5 +1,5 @@
 //
-//  KeychainManager.swift
+//  AuthManager.swift
 //  SwiftyCompanion
 //
 //  Created by Marius Messerschmied on 27.11.24.
@@ -12,15 +12,23 @@ import Security
 actor AuthManager {
     private var refreshTask: Task<String, Error>?
     
+    func checkToken() async throws -> Bool {
+        // could exclude a specific throw in case we want the app to crash in that case
+        do {
+            try await getToken()
+            return true
+        } catch {
+            return false
+        }
+    }
+    
     func getToken() async throws -> String {
         
         if let refreshTask {
             return try await refreshTask.value
         }
         
-        guard let (accessToken, tokenExpiration) = try await getTokenFromKeychain() else {
-            throw NetworkError.unsuccessfulResponse
-        }
+        let (accessToken, tokenExpiration) = try await getTokenFromKeychain()
         
         if Double(tokenExpiration)! > Date().timeIntervalSince1970 {
             return accessToken
@@ -31,6 +39,7 @@ actor AuthManager {
     
     
     func refreshToken() async throws -> String {
+        
         if let refreshTask {
             return try await refreshTask.value
         }
@@ -38,9 +47,10 @@ actor AuthManager {
         let task = Task { () throws -> String in
             defer { refreshTask = nil }
             
-            // since the 42 Api is not issuing a refreshToken, we will delete the exisiting token and send the user back to the login view
+            // 42 API doesn't issue a refreshToken
+            // Hence we will delete the exisiting token and send the user back to the login view
             try await deleteTokenOnKeychain()
-            throw NetworkError.unsuccessfulResponse
+            throw AuthError.invalidRefreshToken
         }
         
         self.refreshTask = task
@@ -48,7 +58,7 @@ actor AuthManager {
     }
     
     
-    func getTokenFromKeychain() async throws -> (String, String)? {
+    func getTokenFromKeychain() async throws -> (String, String) {
         let tag = "swiftyapp-token"
         let getquery: [String: Any] = [kSecClass as String: kSecClassGenericPassword,
                                        kSecAttrAccount as String: tag,
@@ -60,8 +70,7 @@ actor AuthManager {
         var item: CFTypeRef?
         let status = SecItemCopyMatching(getquery as CFDictionary, &item)
         guard status == errSecSuccess else {
-            print("throw error: here1")
-            return nil
+            throw AuthError.missingAccessToken
         }
         
         guard let existingItem = item as? [String : Any],
@@ -69,8 +78,7 @@ actor AuthManager {
               let expirationDate = String(data: expirationDateTimestamp, encoding: .utf8),
               let tokenData = existingItem[kSecValueData as String] as? Data,
               let accessToken = String(data: tokenData, encoding: .utf8) else {
-            print("throw error: here2")
-            return nil
+            throw AuthError.missingAccessToken
         }
         return (accessToken, expirationDate)
     }
@@ -85,8 +93,7 @@ actor AuthManager {
         let status = SecItemDelete(query as CFDictionary)
         
         guard status == errSecSuccess else {
-            print("Something went wrong trying to delete the token")
-            return
+            throw AuthError.failToDeleteToken
         }
     }
     

@@ -13,13 +13,9 @@ final class HomeViewModel: ObservableObject {
     public var isSignedIn: Bool
     
     init() {
-        isSignedIn = true
+        isSignedIn = false
         Task {
-            do {
-                try await AuthManager().getToken()
-            } catch {
-                isSignedIn = false
-            }
+            isSignedIn = try await AuthManager().checkToken()
         }
     }
 }

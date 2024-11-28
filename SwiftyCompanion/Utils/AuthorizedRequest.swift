@@ -20,10 +20,9 @@ class NetworkingWrapper {
        
         let (data, response) = try await URLSession.shared.data(for: request)
         
-        // add more error checking
         if let response = response as? HTTPURLResponse, response.statusCode == 401 {
             // usually here we would retry if we have a refresh token
-            throw NetworkError.unsuccessfulResponse
+            throw AuthError.invalidAccessToken
         }
         
         guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
@@ -35,9 +34,8 @@ class NetworkingWrapper {
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             return try decoder.decode(T.self, from: data)
         } catch {
-            throw NetworkError.unsuccessfulResponse
+            throw NetworkError.responseNotDecodable
         }
-        
         
     }
 
@@ -48,4 +46,5 @@ class NetworkingWrapper {
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         return request
     }
+    
 }
