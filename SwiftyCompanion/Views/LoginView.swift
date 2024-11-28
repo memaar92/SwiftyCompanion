@@ -29,7 +29,6 @@ struct LoginView: View {
                     .padding()
                 Spacer()
                 Button {
-                    // refactor catch statements?
                     Task {
                         do {
                             let callbackURL = try await webAuthenticationSession.authenticate(
@@ -44,6 +43,7 @@ struct LoginView: View {
                         } catch {
                             selectedAlert = AlertContext.genericError
                         }
+                        // add catch statement for when user cancels request
                     }
                 } label: {
                     ButtonView(title: "Login with 42")
