@@ -8,18 +8,21 @@
 import SwiftUI
 import Security
 
-
-actor AuthManager {
+actor AuthManager: ObservableObject {
     static let shared = AuthManager()
+    private init() {}
+    
+    @MainActor
+    @Published public var isLoggedIn: Bool = false
     
     private var refreshTask: Task<String, Error>?
     
-    func checkToken() async throws -> Bool {
+    func checkToken() async throws {
         do {
             try await getToken()
-            return true
+            await updateLoginState(newState: true)
         } catch {
-            return false
+            await updateLoginState(newState: false)
         }
     }
     
@@ -32,6 +35,7 @@ actor AuthManager {
         let (accessToken, tokenExpiration) = try await getTokenFromKeychain()
         
         if Double(tokenExpiration)! > Date().timeIntervalSince1970 {
+            await updateLoginState(newState: true)
             return accessToken
         }
         
@@ -92,9 +96,41 @@ actor AuthManager {
         ]
         
         let status = SecItemDelete(query as CFDictionary)
+        await updateLoginState(newState: false)
         
         guard status == errSecSuccess else {
             throw AuthError.failToDeleteToken
+        }
+    }
+    
+    func storeTokenOnKeychain(token: Token) async throws {
+        let accessToken = token.accessToken.data(using: .utf8)!
+        let tag = "swiftyapp-token"
+        let expirationDate = String(TimeInterval(token.createdAt + token.expiresIn)).data(using: .utf8)!
+        let addquery: [String: Any] = [kSecClass as String: kSecClassGenericPassword,
+                                       kSecAttrAccount as String: tag,
+                                       kSecAttrGeneric as String: expirationDate,
+                                       kSecValueData as String: accessToken]
+        
+        let status = SecItemAdd(addquery as CFDictionary, nil)
+        
+        guard status != errSecDuplicateItem else {
+            await updateLoginState(newState: true)
+            throw AuthError.tokenAlreadyStored
+        }
+        
+        guard status == errSecSuccess else {
+            throw AuthError.failToStoreToken
+        }
+        
+        await updateLoginState(newState: true)
+    }
+    
+    
+    @MainActor
+    private func updateLoginState(newState: Bool) async {
+        if isLoggedIn != newState {
+            isLoggedIn = newState
         }
     }
     

@@ -56,7 +56,7 @@ class LoginViewModel: ObservableObject {
             let decoder = JSONDecoder()
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             let token = try decoder.decode(Token.self, from: data)
-            try await storeTokenOnKeychain(token: token)
+            try await AuthManager.shared.storeTokenOnKeychain(token: token)
         } catch AuthError.tokenAlreadyStored {
             print("Token already stored")
         } catch {
@@ -64,26 +64,6 @@ class LoginViewModel: ObservableObject {
         }
     }
     
-    
-    func storeTokenOnKeychain(token: Token) async throws {
-        let accessToken = token.accessToken.data(using: .utf8)!
-        let tag = "swiftyapp-token"
-        let expirationDate = String(TimeInterval(token.createdAt + token.expiresIn)).data(using: .utf8)!
-        let addquery: [String: Any] = [kSecClass as String: kSecClassGenericPassword,
-                                       kSecAttrAccount as String: tag,
-                                       kSecAttrGeneric as String: expirationDate,
-                                       kSecValueData as String: accessToken]
-        
-        let status = SecItemAdd(addquery as CFDictionary, nil)
-        
-        guard status != errSecDuplicateItem else {
-            throw AuthError.tokenAlreadyStored
-        }
-        
-        guard status == errSecSuccess else {
-            throw AuthError.failToStoreToken
-        }
-    }
     
 }
 

@@ -1,5 +1,5 @@
 //
-//  AuthorizedRequest.swift
+//  NetworkManager.swift
 //  SwiftyCompanion
 //
 //  Created by Marius Messerschmied on 27.11.24.

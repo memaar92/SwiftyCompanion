@@ -50,7 +50,7 @@ struct IDView: View {
                     .padding(4)
                     Button {
                         Task {
-                            try await AuthManager().deleteTokenOnKeychain()
+                            try await AuthManager.shared.deleteTokenOnKeychain()
                         }
                     } label: {
                         ButtonView(title: "Logout")

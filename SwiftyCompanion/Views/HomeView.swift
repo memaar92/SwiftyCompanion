@@ -10,14 +10,16 @@ import SwiftUI
 struct HomeView: View {
     
     @StateObject var viewModel = HomeViewModel()
+    @StateObject private var authManager = AuthManager.shared
     
     var body: some View {
-        if !viewModel.isSignedIn {
-            LoginView(isSignedIn: $viewModel.isSignedIn)
+        if !authManager.isLoggedIn {
+            LoginView()
         } else {
             IDView()
         }
     }
+    
 }
 
 #Preview {

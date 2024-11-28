@@ -10,15 +10,12 @@ import SwiftUI
 
 final class HomeViewModel: ObservableObject {
     
-    @Published public var isSignedIn: Bool
+    //@Published public var isSignedIn: Bool
     
     init() {
-        isSignedIn = false
+        //isSignedIn = false
         Task {
-            let isSignedIn = try await AuthManager.shared.checkToken()
-            DispatchQueue.main.async {
-                self.isSignedIn = isSignedIn
-            }
+            try await AuthManager.shared.checkToken()
         }
     }
 }
