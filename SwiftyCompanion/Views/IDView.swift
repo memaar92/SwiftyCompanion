@@ -48,13 +48,6 @@ struct IDView: View {
                         Text("eval points \(viewModel.user?.correctionPoint ?? 0)")
                     }
                     .padding(4)
-                    Button {
-                        Task {
-                            try await AuthManager.shared.deleteTokenOnKeychain()
-                        }
-                    } label: {
-                        ButtonView(title: "Logout")
-                    }
                 }
                
                 Spacer()
