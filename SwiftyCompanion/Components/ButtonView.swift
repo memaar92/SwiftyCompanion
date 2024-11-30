@@ -14,9 +14,9 @@ struct ButtonView: View {
     var body: some View {
         Text(title)
             .font(.title3)
-            .fontWeight(.semibold)
+            .fontWeight(.medium)
             .frame(width: 361, height: 48)
-            .background(Color.black)
+            .background(Color.PB)
             .foregroundColor(.white)
             .cornerRadius(24)
     }

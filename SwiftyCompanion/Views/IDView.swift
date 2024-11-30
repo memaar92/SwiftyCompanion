@@ -16,10 +16,9 @@ struct IDView: View {
         ZStack {
             BackgroundView()
             Circle()
-                .fill(Color.yellow)
-                .blur(radius: 80)
-                .position(x: 110, y: 520)
-                .opacity(0.8)
+                .fill(Color .HL_1)
+                .position(x: 50, y: 250)
+                .frame(width: 300, height: 300)
             VStack {
                 ProfileCardView(user: viewModel.user)
                     .padding(40)
@@ -27,38 +26,27 @@ struct IDView: View {
                     .onTapGesture {
                         isShowingDetailView.toggle()
                     }
-                Text("😎 \(viewModel.user?.login ?? "unknown")")
-                    .font(.largeTitle)
-                    .padding(.bottom, 10)
+                Text("😎 \(viewModel.user?.login ?? "")")
+                    .padding(8)
+                    .font(.custom("ChivoMono-Light", size: 30))
+                    .background(Color.customWhite)
                 VStack (alignment: .leading) {
-                    HStack {
-                        Image(systemName: "star")
-                        Text("level \(viewModel.user?.cursusUsers[1].level ?? 0)")
-                            .font(.body)
-                    }
-                    .padding(4)
-                    HStack {
-                        Image(systemName: "dollarsign.circle")
-                        Text("wallet \(viewModel.user?.wallet ?? 0)")
-                            .font(.body)
-                    }
-                    .padding(4)
-                    HStack {
-                        Image(systemName: "pencil.tip.crop.circle")
-                        Text("eval points \(viewModel.user?.correctionPoint ?? 0)")
-                    }
-                    .padding(4)
+                    DetailItemView(detail: "level",
+                                    value: Text("\(viewModel.user?.cursusUsers[1].level ?? 0, specifier: "%.2f")"))
+                    DetailItemView(detail: "wallet",
+                                    value: Text("\(viewModel.user?.wallet ?? 0)$"))
+                    DetailItemView(detail: "eval points",
+                                    value: Text("\(viewModel.user?.correctionPoint ?? 0)"))
                 }
-               
+                .frame(maxWidth: 235)
                 Spacer()
             }
             .task {
                 do {
-                   // user = try await viewModel.getMyUser()
                     try await viewModel.getMyUser()
                 } catch {
                     // add more concrete error handling based on error cases
-                    // send to login page? replace with alert? refresh view to trigger getMyUser again?
+                    // replace with alert; refresh view to trigger getMyUser again?
                     print("Error getting user data")
                 }
             }
@@ -69,6 +57,28 @@ struct IDView: View {
         }
     }
 }
+
+
+struct DetailItemView: View {
+    
+    let detail: String
+    let value: Text
+    
+    var body: some View {
+        HStack {
+            Text(detail)
+                .multilineTextAlignment(.leading)
+            Spacer()
+            value
+                .font(.body)
+                .multilineTextAlignment(.trailing)
+        }
+        .padding(4)
+    }
+    
+    
+}
+
 
 struct ProfileCardView: View {
     

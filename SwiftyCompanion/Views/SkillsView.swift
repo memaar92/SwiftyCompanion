@@ -28,7 +28,7 @@ struct SkillItemView: View {
         HStack {
             Text(skill.name)
             Spacer()
-            Text("\(skill.level)")
+            Text("\(skill.level, specifier: "%.2f")")
         }
         .listRowBackground(Color.BG)
     }
