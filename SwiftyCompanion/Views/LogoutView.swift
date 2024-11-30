@@ -9,7 +9,7 @@ import SwiftUI
 
 struct LogoutView: View {
     
-    @ObservedObject private var viewModel = IDViewModel()
+    @EnvironmentObject var viewModel: UserViewModel
     
     var userName: AttributedString {
         var result = " " + AttributedString(viewModel.user?.login ?? "Frodo") + " "
@@ -48,19 +48,11 @@ struct LogoutView: View {
                 .padding()
                 Spacer()
             }
-            .task {
-                do {
-                    try await viewModel.getMyUser()
-                } catch {
-                    // add more concrete error handling based on error cases
-                    // replace with alert; refresh view to trigger getMyUser again?
-                    print("Error getting user data")
-                }
-            }
         }
     }
 }
 
 #Preview {
     LogoutView()
+        .environmentObject(UserViewModel())
 }

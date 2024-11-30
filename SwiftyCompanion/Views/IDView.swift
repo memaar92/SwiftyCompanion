@@ -9,7 +9,7 @@ import SwiftUI
 
 struct IDView: View {
     
-    @ObservedObject private var viewModel = IDViewModel()
+    @EnvironmentObject var viewModel: UserViewModel
     @State var isShowingDetailView = false
     
     var body: some View {
@@ -40,15 +40,6 @@ struct IDView: View {
                 }
                 .frame(maxWidth: 235)
                 Spacer()
-            }
-            .task {
-                do {
-                    try await viewModel.getMyUser()
-                } catch {
-                    // add more concrete error handling based on error cases
-                    // replace with alert; refresh view to trigger getMyUser again?
-                    print("Error getting user data")
-                }
             }
             .sheet(isPresented: $isShowingDetailView) {
                 DetailView(user: viewModel.user)
@@ -115,4 +106,5 @@ struct ProfileCardView: View {
 
 #Preview {
     IDView()
+        .environmentObject(UserViewModel())
 }

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-class IDViewModel: ObservableObject {
+class UserViewModel: ObservableObject {
     
     let networkManager = NetworkManager()
     @Published var user: FortyTwoUser?
@@ -23,7 +23,8 @@ class IDViewModel: ObservableObject {
 }
 
 
-struct FortyTwoUser: Decodable {
+class FortyTwoUser: Decodable, Identifiable {
+    let id: Int
     let image: ImageLink
     let login: String
     let wallet: Int

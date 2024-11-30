@@ -16,22 +16,7 @@ struct HomeView: View {
             if !authManager.isLoggedIn {
                 LoginView()
             } else {
-                TabView {
-                    IDView()
-                        .tabItem {
-                            Label("Me", systemImage: "widget.small")
-                        }
-                    FindPeersView()
-                        .tabItem {
-                            Label("Find Peers", systemImage: "magnifyingglass")
-                        }
-                    LogoutView()
-                        .tabItem {
-                            Label("Adventure", systemImage: "mountain.2")
-                                .environment(\.symbolVariants, .none)
-                        }
-                }
-                .accentColor(.black)
+                ParentTabView()
             }
         }
         .onAppear {
