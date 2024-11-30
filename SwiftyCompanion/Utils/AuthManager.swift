@@ -106,7 +106,8 @@ actor AuthManager: ObservableObject {
     func storeTokenOnKeychain(token: Token) async throws {
         let accessToken = token.accessToken.data(using: .utf8)!
         let tag = "swiftyapp-token"
-        let expirationDate = String(TimeInterval(token.createdAt + token.expiresIn)).data(using: .utf8)!
+        let now = Date().timeIntervalSince1970
+        let expirationDate = String(TimeInterval(now + token.expiresIn)).data(using: .utf8)!
         let addquery: [String: Any] = [kSecClass as String: kSecClassGenericPassword,
                                        kSecAttrAccount as String: tag,
                                        kSecAttrGeneric as String: expirationDate,

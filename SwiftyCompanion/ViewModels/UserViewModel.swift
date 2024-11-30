@@ -23,7 +23,7 @@ class UserViewModel: ObservableObject {
 }
 
 
-class FortyTwoUser: Decodable, Identifiable {
+struct FortyTwoUser: Decodable, Identifiable {
     let id: Int
     let image: ImageLink
     let login: String

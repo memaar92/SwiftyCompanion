@@ -21,7 +21,7 @@ struct HomeView: View {
         }
         .onAppear {
             Task {
-               try await authManager.checkToken()
+                try await authManager.checkToken()
             }
         }
         

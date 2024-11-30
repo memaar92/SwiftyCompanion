@@ -33,9 +33,10 @@ struct ParentTabView: View {
             do {
                 try await userViewModel.getMyUser()
             } catch {
+                print("Error info: \(error)")
                 // add more concrete error handling based on error cases
                 // replace with alert; refresh view to trigger getMyUser again?
-                print("Error getting user data")
+                //print("Error getting user data")
             }
         }
     }

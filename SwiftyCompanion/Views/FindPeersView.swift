@@ -9,7 +9,7 @@ import SwiftUI
 
 struct FindPeersView: View {
     
-    @ObservedObject private var viewModel = FindPeersViewModel()
+    @StateObject private var viewModel = FindPeersViewModel()
     @State private var searchTerm: String = ""
     
     var filteredPeers: [Peer] {
