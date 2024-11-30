@@ -42,7 +42,7 @@ struct IDView: View {
                 Spacer()
             }
             .sheet(isPresented: $isShowingDetailView) {
-                DetailView(user: viewModel.user)
+                DetailView()
                     .presentationDragIndicator(.visible)
             }
         }
