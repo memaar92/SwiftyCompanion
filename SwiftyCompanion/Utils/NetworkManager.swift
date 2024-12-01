@@ -9,7 +9,7 @@ import SwiftUI
 
 struct NetworkManager {
 
-    func makeAuthorizedGetRequest<T: Decodable>(url: URL) async throws -> T {
+    func makeAuthorizedGetRequest<T: Decodable>(url: URL) async throws -> (T, HTTPURLResponse) {
         let request = try await createAuthorizedGetRequest(from: url)
        
         let (data, response) = try await URLSession.shared.data(for: request)
@@ -26,7 +26,7 @@ struct NetworkManager {
         do {
             let decoder = JSONDecoder()
             decoder.keyDecodingStrategy = .convertFromSnakeCase
-            return try decoder.decode(T.self, from: data)
+            return (try decoder.decode(T.self, from: data), response)
         } catch {
             throw NetworkError.responseNotDecodable
         }

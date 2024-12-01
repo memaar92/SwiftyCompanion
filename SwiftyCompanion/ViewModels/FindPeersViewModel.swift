@@ -7,22 +7,104 @@
 
 import SwiftUI
 
+
+
+
 class FindPeersViewModel: ObservableObject {
     
     let networkManager = NetworkManager()
+    
+    @Published var searchMode = false
+    @Published var searchTerm: String = ""
+    var test: String = ""
+    
     @Published var peers: [Peer] = []
+    private var currentPage = 1
+    private var canLoadMorePages = true
+    
+    @Published var peersSearch: [Peer] = []
+    var searchTermSubmitted: String = ""
+    private var currentPageSearch = 1
+    private var canLoadMorePagesSearch = true
+    
+    var filteredPeers: [Peer] {
+        if searchTermSubmitted != searchTerm && !peersSearch.isEmpty {
+            DispatchQueue.main.async {
+                self.resetSearch()
+            }
+            return []
+        }
+        guard !searchTerm.isEmpty else { return peers }
+        return peersSearch
+    }
+    
+    // if moved to View then this only gets loaded when accessing the tab, else it already gets loaded when ParentTabView is accessed
+    init() {
+        Task {
+            try await loadMoreContent()
+        }
+    }
+    
+    func loadMoreContentIfNeeded(currentPeer: Peer?) async throws {
+        guard let currentPeer = currentPeer else {
+            try await loadMoreContent()
+            return
+        }
+        let arrayOnDisplay = searchMode ? peersSearch : peers
+        let thresholdIndex = arrayOnDisplay.index(arrayOnDisplay.endIndex, offsetBy: -5)
+        if arrayOnDisplay.firstIndex(where: { $0.id == currentPeer.id }) == thresholdIndex {
+            try await loadMoreContent()
+        }
+    }
+    
+
+    func loadMoreContent() async throws {
+        searchMode ? try await searchPeers() : try await getPeers()
+    }
     
     func getPeers() async throws {
-        let url = URL(string: "https://api.intra.42.fr/v2/campus/44/users")!
-        let peers = try await networkManager.makeAuthorizedGetRequest(url: url) as [Peer]
-        DispatchQueue.main.async {
-            self.peers = peers
+        guard canLoadMorePages else { return }
+        
+        let url = URL(string: "https://api.intra.42.fr/v2/campus/44/users?sort=login&page=\(currentPage)")!
+        let (peers, response) = try await networkManager.makeAuthorizedGetRequest(url: url) as ([Peer], HTTPURLResponse)
+                
+        if let totalPages = Int(response.value(forHTTPHeaderField: "X-Total") ?? "0"), currentPage >= totalPages {
+            canLoadMorePages = false
         }
+
+        currentPage += 1
+        
+        DispatchQueue.main.async {
+            self.peers += peers
+        }
+    }
+    
+    func searchPeers() async throws {
+        guard canLoadMorePagesSearch else { return }
+        
+        let url = URL(string: "https://api.intra.42.fr/v2/campus/44/users?range[login]=\(searchTermSubmitted.lowercased()),\(searchTermSubmitted.lowercased())z&sort=login&page=\(currentPageSearch)")!
+        let (peersSearch, response) = try await networkManager.makeAuthorizedGetRequest(url: url) as ([Peer], HTTPURLResponse)
+        
+        if let totalPages = Int(response.value(forHTTPHeaderField: "X-Total") ?? "0"), currentPageSearch >= totalPages {
+            canLoadMorePagesSearch = false
+        }
+        
+        DispatchQueue.main.async {
+            self.currentPageSearch += 1
+            self.peersSearch += peersSearch
+        }
+    }
+    
+    func resetSearch() {
+        searchMode = false
+        currentPageSearch = 1
+        canLoadMorePagesSearch = true
+        peersSearch.removeAll()
     }
     
 }
 
-struct Peer: Decodable {
+struct Peer: Decodable, Identifiable {
     let id: Int
     let login: String
 }

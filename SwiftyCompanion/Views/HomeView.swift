@@ -24,7 +24,7 @@ struct HomeView: View {
                 try await authManager.checkToken()
             }
         }
-        
+        // change to .task?
         
     }
     

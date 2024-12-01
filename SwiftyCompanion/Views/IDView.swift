@@ -34,7 +34,7 @@ struct IDView: View {
                     DetailItemView(detail: "level",
                                     value: Text("\(viewModel.user?.cursusUsers[1].level ?? 0, specifier: "%.2f")"))
                     DetailItemView(detail: "wallet",
-                                    value: Text("\(viewModel.user?.wallet ?? 0)$"))
+                                    value: Text("\(viewModel.user?.wallet ?? 0)₳"))
                     DetailItemView(detail: "eval points",
                                     value: Text("\(viewModel.user?.correctionPoint ?? 0)"))
                 }

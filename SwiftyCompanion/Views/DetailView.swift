@@ -33,4 +33,5 @@ struct DetailView: View {
 
 #Preview {
     DetailView()
+        .environmentObject(UserViewModel())
 }

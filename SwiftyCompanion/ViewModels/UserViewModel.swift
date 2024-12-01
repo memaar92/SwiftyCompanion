@@ -14,7 +14,7 @@ class UserViewModel: ObservableObject {
     
     func getMyUser() async throws {
         let url = URL(string: "https://api.intra.42.fr/v2/me")!
-        let user = try await networkManager.makeAuthorizedGetRequest(url: url) as FortyTwoUser
+        let (user, _) = try await networkManager.makeAuthorizedGetRequest(url: url) as (FortyTwoUser, _)
         DispatchQueue.main.async {
             self.user = user
         }

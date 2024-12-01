@@ -10,33 +10,38 @@ import SwiftUI
 struct FindPeersView: View {
     
     @StateObject private var viewModel = FindPeersViewModel()
-    @State private var searchTerm: String = ""
-    
-    var filteredPeers: [Peer] {
-        guard !searchTerm.isEmpty else { return viewModel.peers }
-        return viewModel.peers.filter { $0.login.localizedCaseInsensitiveContains(searchTerm) }
-    }
     
     var body: some View {
         ZStack {
             BackgroundView()
             NavigationStack {
-                List(filteredPeers, id: \.id) { peer in
-                    Text(peer.login)
-                        .font(.headline)
+                List {
+                    ForEach(viewModel.filteredPeers) { peer in
+                        Text(peer.login)
+                            .font(.headline)
+                            .onAppear {
+                                Task {
+                                    try await viewModel.loadMoreContentIfNeeded(currentPeer: peer)
+                                }
+                            }
+                    }
+                }
+                .searchable(text: $viewModel.searchTerm, prompt: "Find peers")
+                .autocapitalization(.none)
+                .onSubmit(of: .search) {
+                    DispatchQueue.main.async {
+                        viewModel.searchMode = true
+                        viewModel.searchTermSubmitted = viewModel.searchTerm
+                    }
+                    Task {
+                        try await viewModel.loadMoreContent()
+                    }
                 }
             }
-            .task {
-                do {
-                    try await viewModel.getPeers()
-                } catch {
-                    // add catches
-                }
-            }
-            .searchable(text: $searchTerm, prompt: "Find peers")
         }
     }
 }
+
 
 #Preview {
     FindPeersView()
