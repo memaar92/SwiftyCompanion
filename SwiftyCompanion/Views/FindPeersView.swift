@@ -17,13 +17,16 @@ struct FindPeersView: View {
             NavigationStack {
                 List {
                     ForEach(viewModel.filteredPeers) { peer in
-                        Text(peer.login)
-                            .font(.headline)
-                            .onAppear {
-                                Task {
-                                    try await viewModel.loadMoreContentIfNeeded(currentPeer: peer)
+                        NavigationLink {
+                            PeerDetailView(userID: peer.id)
+                        } label: {
+                            peerItemView(peer: peer)
+                                .onAppear {
+                                    Task {
+                                        try await viewModel.loadMoreContentIfNeeded(currentPeer: peer)
+                                    }
                                 }
-                            }
+                        }
                     }
                 }
                 .searchable(text: $viewModel.searchTerm, prompt: "Find peers")
@@ -39,6 +42,17 @@ struct FindPeersView: View {
                 }
             }
         }
+    }
+}
+
+
+struct peerItemView: View {
+    
+    var peer: Peer
+    
+    var body: some View {
+        Text(peer.login)
+            .font(.headline)
     }
 }
 

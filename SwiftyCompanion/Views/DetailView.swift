@@ -10,8 +10,8 @@ import SwiftUI
 struct DetailView: View {
     
     @StateObject var viewModel = DetailViewModel()
-    @EnvironmentObject var userViewModel: UserViewModel
     @State private var currentSegment = "Projects"
+    let user: FortyTwoUser?
     
     var body: some View {
         ZStack {
@@ -20,10 +20,10 @@ struct DetailView: View {
                 DismissButtonView()
                 CustomSegmentedView(segments: viewModel.segmentTitles, selected: $currentSegment)
                 if (currentSegment == "Projects") {
-                    ProjectView(projects: userViewModel.user?.projectsUsers ?? [])
+                    ProjectView(projects: user?.projectsUsers ?? [])
                 }
                 else if (currentSegment == "Skills") {
-                    SkillsView(skills: userViewModel.user?.cursusUsers[1].skills ?? [])
+                    SkillsView(skills: user?.cursusUsers[1].skills ?? [])
                 }
             }
         }
@@ -32,6 +32,7 @@ struct DetailView: View {
 
 
 #Preview {
-    DetailView()
-        .environmentObject(UserViewModel())
+    let test = Cursus(level: 0, skills: [])
+    let mockUser = FortyTwoUser(id: 0, image: ImageLink(link: ""), login: "", wallet: 0, correctionPoint: 0, cursusUsers: [test, test], projectsUsers: [])
+    DetailView(user: mockUser)
 }

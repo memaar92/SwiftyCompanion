@@ -9,7 +9,7 @@ import SwiftUI
 
 struct IDView: View {
     
-    @EnvironmentObject var viewModel: UserViewModel
+    let user: FortyTwoUser?
     @State var isShowingDetailView = false
     
     var body: some View {
@@ -20,32 +20,38 @@ struct IDView: View {
                 .position(x: 50, y: 250)
                 .frame(width: 300, height: 300)
             VStack {
-                ProfileCardView(user: viewModel.user)
+                ProfileCardView(user: user)
                     .padding(40)
                     .opacity(0.8)
                     .onTapGesture {
                         isShowingDetailView.toggle()
                     }
-                Text("😎 \(viewModel.user?.login ?? "")")
+                Text("😎 \(user?.login ?? "")")
                     .padding(8)
                     .font(.custom("ChivoMono-Light", size: 30))
                     .background(Color.customWhite)
                 VStack (alignment: .leading) {
                     DetailItemView(detail: "level",
-                                    value: Text("\(viewModel.user?.cursusUsers[1].level ?? 0, specifier: "%.2f")"))
+                                   value: Text("\(user?.cursusUsers[safe: 1]?.level ?? 0, specifier: "%.2f")"))
                     DetailItemView(detail: "wallet",
-                                    value: Text("\(viewModel.user?.wallet ?? 0)₳"))
+                                    value: Text("\(user?.wallet ?? 0)₳"))
                     DetailItemView(detail: "eval points",
-                                    value: Text("\(viewModel.user?.correctionPoint ?? 0)"))
+                                    value: Text("\(user?.correctionPoint ?? 0)"))
                 }
                 .frame(maxWidth: 235)
                 Spacer()
             }
             .sheet(isPresented: $isShowingDetailView) {
-                DetailView()
+                DetailView(user: user)
                     .presentationDragIndicator(.visible)
             }
         }
+    }
+}
+
+extension Array {
+    subscript(safe index: Int) -> Element? {
+        return index >= 0 && index < count ? self[index] : nil
     }
 }
 
@@ -66,8 +72,6 @@ struct DetailItemView: View {
         }
         .padding(4)
     }
-    
-    
 }
 
 
@@ -104,7 +108,9 @@ struct ProfileCardView: View {
     }
 }
 
+
 #Preview {
-    IDView()
-        .environmentObject(UserViewModel())
+    let test = Cursus(level: 0, skills: [])
+    let mockUser = FortyTwoUser(id: 0, image: ImageLink(link: ""), login: "", wallet: 0, correctionPoint: 0, cursusUsers: [test, test], projectsUsers: [])
+    IDView(user: mockUser)
 }

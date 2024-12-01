@@ -20,6 +20,14 @@ class UserViewModel: ObservableObject {
         }
     }
     
+    func getSelectedUser(id: Int) async throws {
+        let url = URL(string: "https://api.intra.42.fr/v2/users/\(id)")!
+        let (user, _) = try await networkManager.makeAuthorizedGetRequest(url: url) as (FortyTwoUser, _)
+        DispatchQueue.main.async {
+            self.user = user
+        }
+    }
+    
 }
 
 

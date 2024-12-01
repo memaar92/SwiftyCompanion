@@ -7,9 +7,6 @@
 
 import SwiftUI
 
-
-
-
 class FindPeersViewModel: ObservableObject {
     
     let networkManager = NetworkManager()

@@ -13,7 +13,7 @@ struct ParentTabView: View {
     
     var body: some View {
         TabView {
-            IDView()
+            MeView()
                 .tabItem {
                     Label("Me", systemImage: "widget.small")
                 }
