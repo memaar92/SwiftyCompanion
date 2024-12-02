@@ -1,5 +1,5 @@
 //
-//  ErrorTypes.swift
+//  ErrorModel.swift
 //  SwiftyCompanion
 //
 //  Created by Marius Messerschmied on 28.11.24.
@@ -21,4 +21,8 @@ enum AuthError: Error {
     case failToDeleteToken
     case tokenAlreadyStored
     case failToStoreToken
+}
+
+enum SearchError: Error {
+    case invalidSearchTerm
 }

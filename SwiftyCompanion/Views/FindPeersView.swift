@@ -10,24 +10,28 @@ import SwiftUI
 struct FindPeersView: View {
     
     @StateObject private var viewModel = FindPeersViewModel()
+    @State private var navPath = NavigationPath()
+    @State private var showingAlert = false
+    @State private var selectedAlert: AlertItem?
     
     var body: some View {
         ZStack {
             BackgroundView()
-            NavigationStack {
+            NavigationStack (path: $navPath) {
                 List {
                     ForEach(viewModel.filteredPeers) { peer in
-                        NavigationLink {
-                            PeerView(userID: peer.id)
-                        } label: {
+                        NavigationLink(value: peer.id) {
                             peerItemView(peer: peer)
                                 .onAppear {
                                     Task {
-                                        try await viewModel.loadMoreContentIfNeeded(currentPeer: peer)
+                                        await loadMoreItems(currentPeer: peer)
                                     }
                                 }
                         }
                     }
+                }
+                .navigationDestination(for: Int.self) { peerID in
+                    PeerIDView(navPath: $navPath, userID: peerID)
                 }
                 .searchable(text: $viewModel.searchTerm, prompt: "Find peers")
                 .autocapitalization(.none)
@@ -37,12 +41,58 @@ struct FindPeersView: View {
                         viewModel.searchTermSubmitted = viewModel.searchTerm
                     }
                     Task {
-                        try await viewModel.loadMoreContent()
+                        await loadSearchContent()
                     }
                 }
             }
         }
+        .alert(selectedAlert?.title ?? Text("Server Error"), isPresented: $showingAlert, presenting: selectedAlert, actions: {detail in
+            if detail == AlertContext.invalidSeachTerm || detail == AlertContext.noAdditionalPeersData {
+                Button("OK") {}
+            }
+            else if detail == AlertContext.noPeersData {
+                Button("Retry") {
+                    Task { await loadSearchContent() }
+                }
+                Button("Cancel", role: .cancel, action: {})
+            } else {
+                Button("OK") {
+                    Task { try await AuthManager.shared.deleteTokenOnKeychain() }
+                }
+            }
+        }, message: { detail in detail.message })
     }
+    
+    
+    private func loadSearchContent() async {
+        do {
+            try await viewModel.loadMoreContent()
+        } catch SearchError.invalidSearchTerm {
+            selectedAlert = AlertContext.invalidSeachTerm
+            showingAlert = true
+        } catch NetworkError.noResponse, NetworkError.responseNotDecodable, NetworkError.unsuccessfulResponse {
+            selectedAlert = AlertContext.noPeersData
+            showingAlert = true
+        } catch {
+            selectedAlert = AlertContext.expiredAuth
+            showingAlert = true
+        }
+    }
+    
+    private func loadMoreItems(currentPeer: Peer) async {
+        do {
+            try await viewModel.loadMoreContentIfNeeded(currentPeer: currentPeer)
+        } catch NetworkError.noResponse, NetworkError.responseNotDecodable, NetworkError.unsuccessfulResponse {
+            selectedAlert = AlertContext.noAdditionalPeersData
+            showingAlert = true
+        } catch {
+            selectedAlert = AlertContext.expiredAuth
+            showingAlert = true
+        }
+    }
+    
+    
+    
 }
 
 

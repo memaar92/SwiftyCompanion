@@ -9,13 +9,13 @@ import SwiftUI
 
 class LoginViewModel: ObservableObject {
     
-    let url42Auth: URL
-    let callBackURLScheme: String = "swiftyapp"
-    
-    init() {
-        url42Auth = buildEndpoint()
+    var url42Auth: URL {
+        let clientID = ProcessInfo.processInfo.environment["clientID"] ?? ""
+        let url = "https://api.intra.42.fr/oauth/authorize?client_id=" + clientID + "&redirect_uri=swiftyapp%3A%2F%2Foauth-callback&response_type=code"
+        return URL(string: url)!
     }
     
+    let callBackScheme: String = "swiftyapp"
     
     func authWith42(callbackURL: URL) async throws {
         let queryItems = URLComponents(string: callbackURL.absoluteString)?.queryItems
@@ -29,12 +29,12 @@ class LoginViewModel: ObservableObject {
     func createToken(code: String) async throws {
         let url = URL(string: "https://api.intra.42.fr/oauth/token")!
         let requestBodyData = AuthCodeData(code: code,
-                                client_id: ProcessInfo.processInfo.environment["clientID"]!,
-                                client_secret: ProcessInfo.processInfo.environment["clientSecret"]!,
+                                client_id: ProcessInfo.processInfo.environment["clientID"] ?? "",
+                                client_secret: ProcessInfo.processInfo.environment["clientSecret"] ?? "",
                                 grant_type: "authorization_code",
                                 redirect_uri: "swiftyapp://oauth-callback")
         
-        // may also run in a do {} statement?
+        
         let jsonData = try JSONEncoder().encode(requestBodyData)
         
         var request = URLRequest(url: url)
@@ -58,18 +58,11 @@ class LoginViewModel: ObservableObject {
             let token = try decoder.decode(Token.self, from: data)
             try await AuthManager.shared.storeTokenOnKeychain(token: token)
         } catch AuthError.tokenAlreadyStored {
+            // do nothing; this case should not occur due to the checkToken in HomeView
             print("Token already stored")
         } catch {
             throw AuthError.missingAccessToken
         }
     }
     
-    
 }
-
-func buildEndpoint() -> URL {
-    let clientID = ProcessInfo.processInfo.environment["clientID"] ?? ""
-    let url = "https://api.intra.42.fr/oauth/authorize?client_id=" + clientID + "&redirect_uri=swiftyapp%3A%2F%2Foauth-callback&response_type=code"
-    return URL(string: url)!
-}
-

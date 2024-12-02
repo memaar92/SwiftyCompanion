@@ -14,6 +14,10 @@ struct NetworkManager {
        
         let (data, response) = try await URLSession.shared.data(for: request)
         
+        guard ((response as? HTTPURLResponse)?.statusCode != nil) else {
+            throw NetworkError.noResponse
+        }
+        
         if let response = response as? HTTPURLResponse, response.statusCode == 401 {
             // usually here we would retry if we have a refresh token
             throw AuthError.invalidAccessToken

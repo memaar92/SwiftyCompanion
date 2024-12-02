@@ -79,7 +79,10 @@ class FindPeersViewModel: ObservableObject {
     func searchPeers() async throws {
         guard canLoadMorePagesSearch else { return }
         
-        let url = URL(string: "https://api.intra.42.fr/v2/campus/44/users?range[login]=\(searchTermSubmitted.lowercased()),\(searchTermSubmitted.lowercased())z&sort=login&page=\(currentPageSearch)")!
+        guard let url = URL(string: "https://api.intra.42.fr/v2/campus/44/users?range[login]=\(searchTermSubmitted.lowercased()),\(searchTermSubmitted.lowercased())z&sort=login&page=\(currentPageSearch)") else {
+            throw SearchError.invalidSearchTerm
+        }
+        
         let (peersSearch, response) = try await networkManager.makeAuthorizedGetRequest(url: url) as ([Peer], HTTPURLResponse)
         
         if let totalPages = Int(response.value(forHTTPHeaderField: "X-Total") ?? "0"), currentPageSearch >= totalPages {

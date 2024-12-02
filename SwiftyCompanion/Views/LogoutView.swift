@@ -14,7 +14,6 @@ struct LogoutView: View {
     var userName: AttributedString {
         var result = " " + AttributedString(viewModel.user?.login ?? "Frodo") + " "
         result.backgroundColor = .customWhite
-        
         return result
     }
     

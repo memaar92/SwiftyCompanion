@@ -25,8 +25,9 @@ struct HomeView: View {
         .onAppear {
             Task {
                 isLoading = true
+                defer { isLoading = false }
+                // if checkToken throws; in all cases isLoggedIn is getting set to false
                 try await authManager.checkToken()
-                isLoading = false
             }
         }        
     }

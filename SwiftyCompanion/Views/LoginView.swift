@@ -12,6 +12,7 @@ struct LoginView: View {
     
     @Environment(\.webAuthenticationSession) private var webAuthenticationSession
     @StateObject private var viewModel = LoginViewModel()
+    @State private var showingAlert = false
     @State private var selectedAlert: AlertItem?
     
     var body: some View {
@@ -23,20 +24,7 @@ struct LoginView: View {
                 Spacer()
                 Button {
                     Task {
-                        do {
-                            let callbackURL = try await webAuthenticationSession.authenticate(
-                                using: viewModel.url42Auth,
-                                callbackURLScheme: viewModel.callBackURLScheme,
-                                preferredBrowserSession: .ephemeral)
-                            try await viewModel.authWith42(callbackURL: callbackURL)
-                        } catch AuthError.missingAuthCode, AuthError.missingAccessToken, NetworkError.unsuccessfulResponse {
-                            selectedAlert = AlertContext.missingAuth
-                        } catch NetworkError.noResponse {
-                            selectedAlert = AlertContext.noResponse
-                        } catch {
-                            selectedAlert = AlertContext.genericError
-                        }
-                        // add catch statement for when user cancels request
+                        await authenticate()
                     }
                 } label: {
                     ButtonView(title: "Login with 42")
@@ -44,10 +32,33 @@ struct LoginView: View {
                 .padding()
             }
         }
-        .alert(item: $selectedAlert) { alert in
-            Alert(title: alert.title, message: alert.message, dismissButton: alert.dismissButton)
+        .alert(selectedAlert?.title ?? Text("Server Error"), isPresented: $showingAlert, presenting: selectedAlert, actions: {_ in }, message: { detail in detail.message })
+    }
+    
+    
+    private func authenticate() async {
+        do {
+            let callbackURL = try await webAuthenticationSession.authenticate(
+                using: viewModel.url42Auth,
+                callback: ASWebAuthenticationSession.Callback.customScheme(viewModel.callBackScheme),
+                preferredBrowserSession: .ephemeral,
+                additionalHeaderFields: [:])
+            try await viewModel.authWith42(callbackURL: callbackURL)
+        } catch let error as ASWebAuthenticationSessionError where error.code == .canceledLogin {
+            // do nothing
+        } catch AuthError.missingAuthCode, AuthError.missingAccessToken, NetworkError.unsuccessfulResponse {
+            selectedAlert = AlertContext.missingAuth
+            showingAlert = true
+        } catch NetworkError.noResponse {
+            selectedAlert = AlertContext.noResponse
+            showingAlert = true
+        } catch {
+            selectedAlert = AlertContext.genericError
+            showingAlert = true
         }
     }
+    
+    
 }
 
 
