@@ -10,6 +10,15 @@ import SwiftUI
 struct Peer: Decodable, Identifiable {
     let id: Int
     let login: String
+    let kind: String
+    let active: Bool
+    
+    enum CodingKeys: String, CodingKey {
+        case id = "id"
+        case login = "login"
+        case kind = "kind"
+        case active = "active?"
+    }
 }
 
 struct FortyTwoUser: Decodable, Identifiable {

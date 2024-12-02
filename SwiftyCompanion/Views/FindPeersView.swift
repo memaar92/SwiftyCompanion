@@ -18,6 +18,11 @@ struct FindPeersView: View {
         ZStack {
             BackgroundView()
             NavigationStack (path: $navPath) {
+                HStack {
+                    activeFilterButtonView(activeFilter: $viewModel.activeFilter)
+                    Spacer()
+                }
+                .padding(.leading)
                 List {
                     ForEach(viewModel.filteredPeers) { peer in
                         NavigationLink(value: peer.id) {
@@ -91,18 +96,42 @@ struct FindPeersView: View {
         }
     }
     
-    
-    
 }
 
+
+struct activeFilterButtonView: View {
+    @Binding var activeFilter: Bool
+    
+    var body: some View {
+        Button {
+            activeFilter.toggle()
+        } label: {
+            HStack {
+                Image(systemName: activeFilter ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease")
+                    .frame(height: 16)
+                Text("active")
+                    .font(.footnote)
+            }
+            .padding(8)
+            .background(activeFilter ? Color.HL_2 : Color.customWhite)
+            .foregroundColor(activeFilter ? Color.white: Color.black)
+            .cornerRadius(8)
+        }
+    }
+}
 
 struct peerItemView: View {
     
     var peer: Peer
     
     var body: some View {
-        Text(peer.login)
-            .font(.headline)
+        VStack (alignment: .leading) {
+            Text(peer.login)
+                .font(.headline)
+            Text(peer.kind)
+            Text(peer.active ? "Active" : "Inactive")
+        }
+        
     }
 }
 

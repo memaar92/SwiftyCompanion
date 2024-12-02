@@ -37,7 +37,8 @@ struct ParentTabView: View {
         .alert(selectedAlert?.title ?? Text("Server Error"), isPresented: $showingAlert, presenting: selectedAlert, actions: {detail in
             if detail == AlertContext.noUserData {
                 Button("Retry") {
-                    Task { await fetchUserData() }
+                    Task {
+                        await fetchUserData() }
                 }
             } else {
                 Button("OK") {

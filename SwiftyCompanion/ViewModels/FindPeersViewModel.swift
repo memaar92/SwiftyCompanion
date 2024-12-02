@@ -13,6 +13,7 @@ class FindPeersViewModel: ObservableObject {
     
     @Published var searchMode = false
     @Published var searchTerm: String = ""
+    @Published var activeFilter = false
     var test: String = ""
     
     @Published var peers: [Peer] = []
@@ -31,7 +32,17 @@ class FindPeersViewModel: ObservableObject {
             }
             return []
         }
-        guard !searchTerm.isEmpty else { return peers }
+        
+        guard !searchTerm.isEmpty else {
+            if activeFilter {
+                return peers.filter { $0.active == true }
+            }
+            return peers
+        }
+        
+        if activeFilter {
+            return peersSearch.filter { $0.active == true }
+        }
         return peersSearch
     }
     
@@ -47,8 +58,11 @@ class FindPeersViewModel: ObservableObject {
             try await loadMoreContent()
             return
         }
-        let arrayOnDisplay = searchMode ? peersSearch : peers
-        let thresholdIndex = arrayOnDisplay.index(arrayOnDisplay.endIndex, offsetBy: -5)
+        var arrayOnDisplay = searchMode ? peersSearch : peers
+        if activeFilter {
+            arrayOnDisplay = arrayOnDisplay.filter { $0.active == true }
+        }
+        let thresholdIndex = arrayOnDisplay.index(arrayOnDisplay.endIndex, offsetBy: activeFilter ? -1 : -5)
         if arrayOnDisplay.firstIndex(where: { $0.id == currentPeer.id }) == thresholdIndex {
             try await loadMoreContent()
         }
