@@ -15,41 +15,58 @@ struct FindPeersView: View {
     @State private var selectedAlert: AlertItem?
     
     var body: some View {
-        ZStack {
-            BackgroundView()
-            NavigationStack (path: $navPath) {
-                HStack {
-                    activeFilterButtonView(activeFilter: $viewModel.activeFilter)
-                    Spacer()
-                }
-                .padding(.leading)
-                List {
-                    ForEach(viewModel.filteredPeers) { peer in
-                        NavigationLink(value: peer.id) {
-                            peerItemView(peer: peer)
-                                .onAppear {
-                                    Task {
-                                        await loadMoreItems(currentPeer: peer)
+        NavigationStack (path: $navPath) {
+            ZStack {
+                BackgroundView()
+                VStack {
+                    HStack {
+                        activeFilterButtonView(activeFilter: $viewModel.activeFilter)
+                        Spacer()
+                    }
+                    .padding(.leading)
+                    List {
+                        ForEach(viewModel.filteredPeers) { peer in
+                            NavigationLink(value: peer.id) {
+                                peerItemView(peer: peer)
+                                    .onAppear {
+                                        Task {
+                                            await loadMoreItems(currentPeer: peer)
+                                        }
                                     }
-                                }
+                            }
+                            .listRowBackground(
+                                RoundedRectangle(cornerRadius: 0)
+                                    .fill(Color.customWhite)
+                                    .padding(
+                                        EdgeInsets(
+                                            top: 4,
+                                            leading: 0,
+                                            bottom: 4,
+                                            trailing: 0
+                                        )
+                                    )
+                            )
+                            .listRowSeparator(.hidden)
+                        }
+                    }
+                    .scrollContentBackground(.hidden)
+                    .navigationDestination(for: Int.self) { peerID in
+                        PeerIDView(navPath: $navPath, userID: peerID)
+                    }
+                    .searchable(text: $viewModel.searchTerm, prompt: "Find peers")
+                    .autocapitalization(.none)
+                    .onSubmit(of: .search) {
+                        DispatchQueue.main.async {
+                            viewModel.searchMode = true
+                            viewModel.searchTermSubmitted = viewModel.searchTerm
+                        }
+                        Task {
+                            await loadSearchContent()
                         }
                     }
                 }
-                .navigationDestination(for: Int.self) { peerID in
-                    PeerIDView(navPath: $navPath, userID: peerID)
-                }
-                .searchable(text: $viewModel.searchTerm, prompt: "Find peers")
-                .autocapitalization(.none)
-                .onSubmit(of: .search) {
-                    DispatchQueue.main.async {
-                        viewModel.searchMode = true
-                        viewModel.searchTermSubmitted = viewModel.searchTerm
-                    }
-                    Task {
-                        await loadSearchContent()
-                    }
-                }
             }
+            
         }
         .alert(selectedAlert?.title ?? Text("Server Error"), isPresented: $showingAlert, presenting: selectedAlert, actions: {detail in
             if detail == AlertContext.invalidSeachTerm || detail == AlertContext.noAdditionalPeersData {
@@ -113,7 +130,7 @@ struct activeFilterButtonView: View {
                     .font(.footnote)
             }
             .padding(8)
-            .background(activeFilter ? Color.HL_2 : Color.customWhite)
+            .background(activeFilter ? Color.HL_1 : Color.customWhite)
             .foregroundColor(activeFilter ? Color.white: Color.black)
             .cornerRadius(8)
         }
@@ -126,12 +143,16 @@ struct peerItemView: View {
     
     var body: some View {
         VStack (alignment: .leading) {
-            Text(peer.login)
-                .font(.headline)
+            HStack (spacing: 4) {
+                Text(peer.login)
+                    .font(.headline)
+                Circle()
+                    .fill(peer.active ? Color.HL_1 : Color.HL_2)
+                    .frame(width: 6, height: 6)
+            }
             Text(peer.kind)
-            Text(peer.active ? "Active" : "Inactive")
         }
-        
+        .padding(4)
     }
 }
 

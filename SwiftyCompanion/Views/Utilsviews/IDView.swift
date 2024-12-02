@@ -81,16 +81,8 @@ struct ProfileCardView: View {
     
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(Color.purple)
-                .stroke(
-                    .linearGradient(colors: [
-                        .white.opacity(0.5),
-                        .clear,
-                        .purple.opacity(0.2),
-                        .purple.opacity(0.5),
-                    ], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 15
-                )
                 .frame(width: 325, height: 418)
                 .shadow(radius: 8)
             
@@ -103,7 +95,7 @@ struct ProfileCardView: View {
             }
         }
         .frame(width: 325, height: 418)
-        .cornerRadius(24)
+        .cornerRadius(16)
         .shadow(radius: 8)
     }
 }

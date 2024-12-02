@@ -62,7 +62,8 @@ class FindPeersViewModel: ObservableObject {
         if activeFilter {
             arrayOnDisplay = arrayOnDisplay.filter { $0.active == true }
         }
-        let thresholdIndex = arrayOnDisplay.index(arrayOnDisplay.endIndex, offsetBy: activeFilter ? -1 : -5)
+        var thresholdIndex = arrayOnDisplay.index(arrayOnDisplay.endIndex, offsetBy: -5)
+        if thresholdIndex < 5 { thresholdIndex = arrayOnDisplay.index(arrayOnDisplay.endIndex, offsetBy: -1) }
         if arrayOnDisplay.firstIndex(where: { $0.id == currentPeer.id }) == thresholdIndex {
             try await loadMoreContent()
         }
