@@ -18,7 +18,7 @@ struct FindPeersView: View {
                 List {
                     ForEach(viewModel.filteredPeers) { peer in
                         NavigationLink {
-                            PeerDetailView(userID: peer.id)
+                            PeerView(userID: peer.id)
                         } label: {
                             peerItemView(peer: peer)
                                 .onAppear {

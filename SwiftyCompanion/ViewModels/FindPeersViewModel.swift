@@ -100,8 +100,3 @@ class FindPeersViewModel: ObservableObject {
     }
     
 }
-
-struct Peer: Decodable, Identifiable {
-    let id: Int
-    let login: String
-}

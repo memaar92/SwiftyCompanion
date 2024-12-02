@@ -1,5 +1,5 @@
 //
-//  PeerDetailView.swift
+//  PeerView.swift
 //  SwiftyCompanion
 //
 //  Created by Marius Messerschmied on 01.12.24.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct PeerDetailView: View {
+struct PeerView: View {
     
     @StateObject private var viewModel = UserViewModel()
     let userID: Int
@@ -32,5 +32,5 @@ struct PeerDetailView: View {
 }
 
 #Preview {
-    PeerDetailView(userID: 42)
+    PeerView(userID: 42)
 }

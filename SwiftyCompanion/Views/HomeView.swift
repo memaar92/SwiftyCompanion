@@ -10,10 +10,13 @@ import SwiftUI
 struct HomeView: View {
     
     @StateObject private var authManager = AuthManager.shared
+    @State private var isLoading = true
     
     var body: some View {
         VStack {
-            if !authManager.isLoggedIn {
+            if isLoading {
+                ProgressView()
+            } else if !authManager.isLoggedIn {
                 LoginView()
             } else {
                 ParentTabView()
@@ -21,13 +24,12 @@ struct HomeView: View {
         }
         .onAppear {
             Task {
+                isLoading = true
                 try await authManager.checkToken()
+                isLoading = false
             }
-        }
-        // change to .task?
-        
+        }        
     }
-    
 }
 
 #Preview {

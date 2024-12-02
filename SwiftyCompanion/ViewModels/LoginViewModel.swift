@@ -28,7 +28,7 @@ class LoginViewModel: ObservableObject {
     
     func createToken(code: String) async throws {
         let url = URL(string: "https://api.intra.42.fr/oauth/token")!
-        let requestBodyData = RequestBodyData(code: code,
+        let requestBodyData = AuthCodeData(code: code,
                                 client_id: ProcessInfo.processInfo.environment["clientID"]!,
                                 client_secret: ProcessInfo.processInfo.environment["clientSecret"]!,
                                 grant_type: "authorization_code",
@@ -72,24 +72,4 @@ func buildEndpoint() -> URL {
     let url = "https://api.intra.42.fr/oauth/authorize?client_id=" + clientID + "&redirect_uri=swiftyapp%3A%2F%2Foauth-callback&response_type=code"
     return URL(string: url)!
 }
-
-
-struct Token: Decodable {
-    let accessToken: String
-    let tokenType: String // may remove
-    let expiresIn: Double
-    let scope: String // may remove
-    let createdAt: Double
-}
-
-struct RequestBodyData: Encodable {
-    let code: String
-    let client_id: String
-    let client_secret: String
-    let grant_type: String
-    let redirect_uri: String
-}
-
-
-
 
