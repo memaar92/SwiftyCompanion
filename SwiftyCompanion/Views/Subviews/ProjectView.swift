@@ -14,8 +14,10 @@ struct ProjectView: View {
     var body: some View {
         List(projects) { project in
             ProjectItemView(project: project)
+                .padding(-15)
         }
         .scrollContentBackground(.hidden)
+        .listRowSpacing(4)
     }
 }
 
@@ -26,19 +28,30 @@ struct ProjectItemView: View {
     
     var body: some View {
         HStack {
-            Text(project.project.name)
+            HStack {
+                Text(project.project.name)
+                Spacer()
+            }
+            .frame(width: 275, height: 40)
+            .padding(.leading, 10)
+            .background(Color.customWhite)
             Spacer()
-            if project.finalMark == nil {
-                Text("🏃‍♂️")
-            } else {
-                if project.finalMark! > 0 {
-                    Text("💪")
+            HStack {
+                if project.finalMark == nil {
+                    Text("🏃‍♂️")
                 } else {
-                    Text("💀")
+                    if project.finalMark! > 0 {
+                        Text("💪")
+                    } else {
+                        Text("💀")
+                    }
                 }
             }
+            .frame(width: 60, height: 40)
+            .background(Color.customWhite)
         }
         .listRowBackground(Color.BG)
+        .listRowSeparator(.hidden)
     }
 }
 

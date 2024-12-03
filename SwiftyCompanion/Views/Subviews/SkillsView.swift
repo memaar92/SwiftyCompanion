@@ -14,8 +14,11 @@ struct SkillsView: View {
     var body: some View {
         List(skills) { skill in
             SkillItemView(skill: skill)
+                .padding(-15)
         }
         .scrollContentBackground(.hidden)
+        .listRowSpacing(4)
+
     }
 }
 
@@ -26,15 +29,28 @@ struct SkillItemView: View {
     
     var body: some View {
         HStack {
-            Text(skill.name)
+            HStack {
+                Text(skill.name)
+                Spacer()
+            }
+            .frame(width: 275, height: 40)
+            .padding(.leading, 10)
+            .background(Color.customWhite)
             Spacer()
-            Text("\(skill.level, specifier: "%.2f")")
+            HStack {
+                Text("\(skill.level, specifier: "%.2f")")
+            }
+            .frame(width: 60, height: 40)
+            .background(Color.customWhite)
         }
         .listRowBackground(Color.BG)
+        .listRowSeparator(.hidden)
     }
 }
 
 
 #Preview {
-    SkillsView(skills: [])
+    let skill = Skill(id: 1, name: "SwiftUI", level: 0.8)
+    let skill2 = Skill(id: 1, name: "SwiftUI", level: 0.8)
+    SkillsView(skills: [skill, skill2])
 }

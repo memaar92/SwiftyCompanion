@@ -35,7 +35,7 @@ struct FindPeersView: View {
                                     }
                             }
                             .listRowBackground(
-                                RoundedRectangle(cornerRadius: 0)
+                                Rectangle()
                                     .fill(Color.customWhite)
                                     .padding(
                                         EdgeInsets(
