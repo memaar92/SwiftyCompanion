@@ -12,5 +12,7 @@ Swifty Companion is part of the 42 advanced curriculum and designed to explore t
 
 
 ## Preview:
-https://github.com/user-attachments/assets/64f935b9-5f74-4aaf-a39f-86dba778f2bc
+https://github.com/user-attachments/assets/a4232458-b893-40fb-93d1-60911c0dddbf
+
+
 
