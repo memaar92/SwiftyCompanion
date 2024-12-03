@@ -68,7 +68,6 @@ struct TitleImageView: View {
         VStack (alignment: .leading) {
             Text("Swifty\nCompanion")
                 .font(.custom("ChivoMono-Light", size: 30))
-                .foregroundColor(.black)
                 .multilineTextAlignment(.leading)
                 .padding(.leading)
             HStack () {
