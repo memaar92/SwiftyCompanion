@@ -14,11 +14,15 @@ struct SkillsView: View {
     var body: some View {
         List(skills) { skill in
             SkillItemView(skill: skill)
-                .padding(-15)
+                .padding(.bottom, -16)
+                .padding(.top, 8)
         }
         .scrollContentBackground(.hidden)
+        .scrollIndicators(.hidden)
+        .listStyle(.plain)
+        .padding(.leading, 24)
+        .padding(.trailing, 24)
         .listRowSpacing(4)
-
     }
 }
 
@@ -31,10 +35,10 @@ struct SkillItemView: View {
         HStack {
             HStack {
                 Text(skill.name)
+                    .padding(.leading, 12)
                 Spacer()
             }
             .frame(width: 275, height: 40)
-            .padding(.leading, 10)
             .background(Color.customWhite)
             Spacer()
             HStack {
@@ -43,7 +47,19 @@ struct SkillItemView: View {
             .frame(width: 60, height: 40)
             .background(Color.customWhite)
         }
-        .listRowBackground(Color.BG)
+        //.listRowBackground(Color.BG)
+        .listRowBackground(
+            Rectangle()
+                .fill(Color.BG)
+                .padding(
+                    EdgeInsets(
+                        top: 20,
+                        leading: 0,
+                        bottom: 20,
+                        trailing: 0
+                    )
+                )
+        )
         .listRowSeparator(.hidden)
     }
 }
